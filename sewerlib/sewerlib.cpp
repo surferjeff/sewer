@@ -237,7 +237,8 @@ HANDLE ConnectPipeBroker(StdState* stdstate, DWORD timeout_ms) {
   vector<wchar_t> app_path(MAX_PATH);
   DWORD app_path_len;
   while(true) {
-      app_path_len = GetModuleFileNameW(NULL, &app_path[0], app_path.size());
+    HMODULE sewerlib = GetModuleHandleW(L"sewerlib");
+    app_path_len = GetModuleFileNameW(sewerlib, &app_path[0], app_path.size());
     if (app_path_len > 0)
       break;
     app_path.resize(app_path.size() * 2);

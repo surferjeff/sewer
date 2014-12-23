@@ -146,14 +146,21 @@ start() ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
+get_release_dir() ->
+    case filename:find_src(sewer) of
+	{error, {Reason, Module}} -> 
+	    {error, {Reason, Module}};
+	{SourcePath, _Options} ->
+	    DirName = filename:dirname(SourcePath),
+	    filename:join([DirName, "Release"])
+    end.
+
 get_exe_path(Options) ->
     proplists:get_value(binpath, Options,
-			"C:\\Users\\jeff\\rgs\\code\\code\\sewer\\Release"
-			"\\sewer.exe").
+			filename:join(get_release_dir(), "\\sewer.exe")).
 
 get_dll_path(Options) ->
-    proplists:get_value(binpath, Options,
-			"C:\\Users\\jeff\\rgs\\code\\code\\sewer\\Release").
+    proplists:get_value(binpath, Options, get_release_dir()).
 
 open_sewer_port(Options) ->
     case proplists:get_value(dll, Options) of

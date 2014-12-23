@@ -9,7 +9,7 @@
 %%%
 %%% Run the hot pototo game with windows pipes,
 %%% with 10 players, 5000 potato passes, and a 100-byte potato.
-%%% "C:\Program Files (x86)\erl6.2\bin\erl.exe" -sname pipe_master --s potato_master init sewer 10 5000 100
+%%% "C:\Program Files (x86)\erl6.2\bin\erl.exe" -sname pipe_master -s potato_master init sewer 10 5000 100
 %%%
 %%% @end
 %%% Created :  1 Jan 2013 by  <jeff@LENOVO>

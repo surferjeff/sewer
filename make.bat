@@ -7,4 +7,6 @@ set ERL32_LIB=c:\Program Files (x86)\erl6.2\usr\lib
 devenv sewer\sewer.sln /build Release
 
 :: Compile the erlang files.
-sewer\sewer.bat
+cd sewer
+call make.bat
+cd ..

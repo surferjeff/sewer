@@ -16,7 +16,7 @@
 %%%-------------------------------------------------------------------
 -module(potato_master).
 
--export([init/1]).
+-export([init/1, run/1]).
 
 to_int(Atom) ->
     list_to_integer(atom_to_list(Atom)).
@@ -33,6 +33,10 @@ init([SendModule | Atoms]) ->
     lists:foreach(fun(Player) -> Player ! {kick, Players} end, Players),
     {Microseconds, _Result} = timer:tc(fun() -> wait_for_done(PlayerCount) end),
     io:format("Time in milliseconds: ~w~n", [Microseconds div 1000]).
+
+run([SendModule | Atoms]) ->
+    init([SendModule | Atoms]),
+    halt(0).
 
 wait_for_ready(0, Players) ->
     Players;

@@ -230,15 +230,29 @@ HANDLE ConnectPipeBroker(StdState* stdstate, DWORD timeout_ms) {
   if (INVALID_HANDLE_VALUE != pipe) {
     return pipe;
   }
-  // Try launching the PipeBroker.
+  // Try launching the PipeBroker.  It lives in the same directory
+  // as this module.  So start by getting the path to this module.
   PROCESS_INFORMATION proc_info = { 0 };
   STARTUPINFO start_info = { sizeof(start_info) };
-  static const TCHAR app_name[] =
-    _T("C:\\Users\\jeff\\rgs\\code\\code\\sewerpipes\\")
-    _T(STRINGIFY(CONFIGURATION_NAME))
-    _T("\\SewerPipes.exe");
+  vector<wchar_t> app_path(MAX_PATH);
+  DWORD app_path_len;
+  while(true) {
+      app_path_len = GetModuleFileNameW(NULL, &app_path[0], app_path.size());
+    if (app_path_len > 0)
+      break;
+    app_path.resize(app_path.size() * 2);
+  }
+  // Strip out the name of this module.
+  BOOL stripped = PathRemoveFileSpecW(&app_path[0]);
+  // And append the name of the EXE we want to run.
+  static const TCHAR exe[] = _T("\\SewerPipes.exe");
+  DWORD const appended_length = sizeof(exe) / sizeof(exe[0])
+    + _tcslen(&app_path[0] + 1);
+  if (app_path.size() < appended_length)
+    app_path.resize(appended_length);
+  BOOL appended = PathAppendW(&app_path[0], exe);
   TCHAR command_line[] = _T("SewerPipes");
-  BOOL created = CreateProcess(app_name, NULL,
+  BOOL created = CreateProcessW(&app_path[0], NULL,
     NULL, NULL, FALSE, 0, NULL, NULL, &start_info, &proc_info);
   if (!created) {
     const DWORD error = GetLastError();
@@ -253,10 +267,10 @@ HANDLE ConnectPipeBroker(StdState* stdstate, DWORD timeout_ms) {
       (LPSTR) &error_text,
       0, NULL );
     static const char message[] = "Failed to create pipe broker %ls.\n%hs";
-    vector<char> message_buffer(sizeof(app_name) + sizeof(message)
+    vector<char> message_buffer(2 * app_path.size() + sizeof(message)
       + strlen(error_text));
     _snprintf(&message_buffer[0], message_buffer.size(), message,
-      app_name, error_text);
+      &app_path[0], error_text);
     WriteFatalError(stdstate, &message_buffer[0]);
     LocalFree(error_text);
     return pipe;

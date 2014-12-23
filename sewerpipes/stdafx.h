@@ -34,10 +34,6 @@ typedef std::basic_stringstream<TCHAR> tstringstream;
 #include "erl_interface.h"
 #include "ei.h"
 
-// Boost.
-#include "boost/shared_ptr.hpp"
-#include "boost/iterator/iterator_facade.hpp"
-
 // ATL
 #include <atlbase.h>
 
